@@ -1,7 +1,5 @@
 
-#b prepare.cpp:46
-
-run test
+run 
 
 quit
 

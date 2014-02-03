@@ -1,19 +1,15 @@
+#include"matcher.h"
+
 #include<stdio.h>
-#include<regex>
-#include<string>
 
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<unistd.h>
 #include<fcntl.h>
 #include<dirent.h>
-#include<iostream>
 
 void processFile(int fd, struct stat* const fileStat);
 int main(int argc, char** argv) {
-//  std::regex reg("(.*)(cc)(.*)");
-//  printf("%d\n", (int) regex_match("ccccc", reg));
-//  exit(0);
   if(argc < 2) {
     printf("No input file specified\n");
   }
@@ -31,8 +27,6 @@ int main(int argc, char** argv) {
     return 1;
   }
   
-  off_t size = fileStat.st_size;
-
   processFile(fd, &fileStat);
 }
 
@@ -43,15 +37,11 @@ void processFile(int fd, struct stat* const fileStat) {
   if (bytes != fileStat->st_size) {
     printf("Could not read entire file\n");
   } else {
-    std::string* str = new std::string(fullData, bytes);
-    std::regex matcher("[a-zA-Z_][a-zA-Z_0-9]*\\.[a-zA-Z0-9]+");
-    std::cmatch results;
-    
-    bool matched = regex_search(fullData, results, matcher);
-    printf("%s\n", matched ? "matched" : "not matched");
-    for(unsigned int i=0; i<results.size(); i++) {
-      printf("%s\n", results.str().data());
-    }
+    matcher* start_m;
+    matcher* end_m;
+    build_matcher("<BODY>", start_m);
+    build_matcher("</BODY>", end_m);
+    printf("%d\n", search(fullData, start_m) < search(fullData, end_m));
   }
   delete fullData;
 }

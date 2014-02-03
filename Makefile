@@ -6,7 +6,7 @@ CMD=$(CC) $(FLAGS)
 all: clean
 	mkdir bin
 	cd src && \
-	$(CMD) prepare.cpp -o ../bin/prepare
+	$(CMD) prepare.cpp matcher.cpp matcher.h -o ../bin/prepare
 	cd ..
 
 clean:

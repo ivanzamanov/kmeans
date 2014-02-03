@@ -9,11 +9,19 @@ struct match_result {
 struct matcher {
   char* string;
   unsigned int n;
-  int* sinks;
+  char min_char;
+  char max_char;
+  int** table;
   ~matcher() {
-    delete stirng;
-    delete sinks;
+    delete string;
+    for (unsigned int i = 0; i < n+1; i++) {
+      delete table[i];
+    }
+    delete table;
   }
 };
+
+bool build_matcher(const char* string, matcher* &result);
+int search(char const* string, const matcher& matcher);
 
 #endif
