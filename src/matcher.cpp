@@ -29,39 +29,44 @@ bool build_matcher(const char* string, matcher* &result) {
       max_char = c;
     }
   }
-  unsigned int range = max_char - min_char;
+  unsigned int range = max_char - min_char + 1;
   result->min_char = min_char;
   result->max_char = max_char;
   // Transitions table
-  result->table = new int*[n + 1];
+  result->table = new unsigned int*[n + 1];
   for (unsigned int i = 0; i < n + 1; i++) {
-    result->table[i] = new int[range+1];
+    result->table[i] = new unsigned int[range];
   }
 
-  int** table = result->table;
+  unsigned int** table = result->table;
   for (unsigned int i = 0; i < n+1; i++) {
-    for (unsigned int j = 0; j < range + 1; j++) {
+    for (unsigned int j = 0; j < range; j++) {
       table[i][j] = 0;
     }
   }
   
+  // Will hold the sink state for each character
+  // So we won't need to go back every time and search
+  unsigned int* sinks = new unsigned int[range];
+  for(unsigned int i = 0; i < range; i++) {
+    sinks[i] = 0;
+  }
+
   // Populate transitions
   for (unsigned int i = 0; i < n+1; i++) {
-    // Always a transition to the next state
-    // with the current char
-    int c = (int) result->string[i];
-    table[i][c] = i+1;
+    unsigned int c = (unsigned int) result->string[i];
     // Sink back to the first state which has
     // a transition with this char for all previous
     // characters
-    for (int k = i-1; k >= 0; k--) {
-      int sink_char = (int) result->string[k];
-      int target = table[i][sink_char];
-      if(target == -1) {
-        table[i][sink_char] = k;
-      }
+    // Always a transition to the next state
+    // with the current char
+    // This is the new sink state for this char
+    sinks[c] = i+1;
+    for (unsigned int j = 0; j < range; j++) {
+      table[i][j] = sinks[j];
     }
   }
+  delete sinks;
   return 1;
 }
 
@@ -76,7 +81,7 @@ int search(char const* string, const matcher& matcher) {
       n = 0;
       continue;
     }
-    n = matcher.table[n][c];
+    n = matcher.table[n][c - matcher.min_char];
     if(n == matcher.n) {
       return i - n;
     }

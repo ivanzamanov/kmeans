@@ -1,17 +1,12 @@
 #ifndef __MATCHER_H__
 #define __MATCHER_H__
 
-struct match_result {
-  int count = 0;
-  int* pos = 0;
-};
-
 struct matcher {
   char* string;
   unsigned int n;
   char min_char;
   char max_char;
-  int** table;
+  unsigned int** table;
   ~matcher() {
     delete string;
     for (unsigned int i = 0; i < n+1; i++) {

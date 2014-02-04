@@ -1,6 +1,4 @@
 
-set -e
-
 make all
 
-gdb -x debug.gdb bin/prepare
+gdb -x debug.gdb bin/extractor
