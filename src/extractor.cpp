@@ -1,6 +1,9 @@
 #include"matcher.h"
 
 #include<stdio.h>
+#include<cstdio>
+#include<cstring>
+#include<cstdlib>
 
 #include<sys/types.h>
 #include<sys/stat.h>
@@ -19,11 +22,17 @@ struct article_match {
 
 void processFile(int inputFileFD, struct stat* const fileStat);
 article_match* get_match(const char* data, const matcher& startMarker, const matcher& endMarker);
-void save_article(article_match* match, const char* data, int article_num);
+void save_article(article_match* match, const char* data, int articleIndex);
+
+char* outputDir;
+char* articleFileName;
+int articleCount = 0;
+int articleIndexOffset = 0;
 
 int main(int argc, char** argv) {
-  if(argc < 2) {
+  if(argc < 3) {
     printf("Not enough arguments\n");
+    printf("Usage: %s <input_file> <output_dir> <output_count_offset>\n", argv[0]);
     return 1;
   }
 
@@ -40,7 +49,9 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  char* outputDir = argv[2];
+  outputDir = argv[2];
+  articleCount = 0;
+  articleIndexOffset = strtol(argv[3], NULL, 0);
   
   processFile(inputFD, &fileStat);
 }
@@ -60,7 +71,6 @@ void processFile(int inputFD, struct stat* const fileStat) {
     build_matcher("</BODY>", endMarker);
     article_match* lastArticleMatch = 0;
     int lastArticleEndPos = 0;
-    int articleCount = 0;
 
     // Read articles while found
     do {
@@ -70,12 +80,14 @@ void processFile(int inputFD, struct stat* const fileStat) {
       if(lastArticleMatch != 0) {
         // Found an article, save it
         articleCount++;
-        save_article(lastArticleMatch, offsetData, articleCount);
+        save_article(lastArticleMatch, offsetData, articleCount + articleIndexOffset);
         // Move offset after the article's end.
         lastArticleEndPos = lastArticleEndPos + lastArticleMatch->end;
         delete lastArticleMatch;
       }
     } while(lastArticleMatch != 0);
+
+    printf("Parsed %d articles\n", articleCount);
   }
   delete fullData;
 }
@@ -97,7 +109,7 @@ article_match* get_match(const char* data, const matcher& startMarker, const mat
   return 0;
 }
 
-void save_article(article_match* match, const char* data, int article_num) {
+void save_article(article_match* match, const char* data, int articleIndex) {
   int startPos = match->start;
   int endPos = match->end;
   int length = endPos - startPos;
@@ -107,6 +119,13 @@ void save_article(article_match* match, const char* data, int article_num) {
     articleData[i] = data[startPos + i];
   }
   
+  char* outputFile = new char[strlen(outputDir) + 100];
+  int pathLength = sprintf(outputFile, "%s/article-%d", outputDir, articleIndex);
+  outputFile[pathLength] = 0;
+  int fd = open(outputFile, O_CREAT | O_WRONLY, 0644);
+  write(fd, articleData, length);
+  close(fd);
   delete articleData;
-  printf("%s\n\n\n", articleData);
+  delete outputFile;
 }
+
