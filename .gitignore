@@ -12,5 +12,9 @@
 *.la
 *.a
 
+# vim files
+*.swp
+*~
+
 /data
 /bin
