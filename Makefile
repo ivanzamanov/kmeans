@@ -3,12 +3,16 @@ FLAGS=-Wall -std=c++11 -g
 CC=g++
 CMD=$(CC) $(FLAGS)
 
-all: clean
-	mkdir bin
-	cd src && \
-	$(CMD) extractor.cpp matcher.cpp matcher.h -o ../bin/extractor
-	cd ..
+export
+
+all: clean extractor tokenizer
 
 clean:
 	rm -rf bin
+	mkdir bin
 
+extractor:
+	$(MAKE) -C src/extractor all
+
+tokenizer:
+	$(MAKE) -C src/tokenizer all
