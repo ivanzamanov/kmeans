@@ -41,7 +41,7 @@ int ptree::get(const char* str) {
 	const char* s = str;
 	int state = 0;
 	while(*s != '\0' && state >= 0) {
-		int c = *str - 'a';
+		int c = *s - 'a';
 		state = table[state][c];
 		s++;
 	}
@@ -56,7 +56,7 @@ void ptree::add(const char* str, int i) {
 	const char* s = str;
 	int state = 0;
 	while(*s != '\0') {
-		int c = *str - 'a';
+		int c = *s - 'a';
 		int n_state = table[state][c];
 		if(n_state == -1) {
 			break;
@@ -70,6 +70,7 @@ void ptree::add(const char* str, int i) {
 		int new_state = buildState();
 		table[state][c] = new_state;
 		state = new_state;
+		s++;
 	}
 	values[state] = i;
 }
