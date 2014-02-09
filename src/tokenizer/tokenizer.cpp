@@ -13,12 +13,22 @@
 void processFile(int inputFD, int outputFD, struct stat* fileStat);
 
 int main(int argc, char** argv) {
+	int inputFD = -1;
 	int outputFD = -1;
+
+	const char* inputPath = "STDIN";
 	if(argc < 2) {
-		printf("Not enough arguments\n");
-		printf("Usage: %s <input_file> [<output_file>]\n", argv[0]);
-		return 1;
-	} else if (argc == 2) {
+		inputFD = 0;
+	} else {
+		inputPath = argv[1];
+		inputFD = open(inputPath, O_RDONLY);
+		if(inputFD < 0) {
+			printf("Cannot open file %s\n", inputPath);
+			return 1;
+		}
+	}
+
+	if(argc < 3) {
 		outputFD = 1;
 	} else {
 		char* outputPath = argv[2];
@@ -29,13 +39,6 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	char* inputPath = argv[1];
-	int inputFD = open(inputPath, O_RDONLY);
-	if(inputFD < 0) {
-		printf("Cannot open file %s\n", inputPath);
-		return 1;
-	}
-
 	struct stat fileStat;
 	if(fstat(inputFD, &fileStat) != 0) {
 		printf("Cannot stat file %s\n", inputPath);
@@ -43,6 +46,10 @@ int main(int argc, char** argv) {
 	}
 
 	processFile(inputFD, outputFD, &fileStat);
+
+	if(outputFD == 1) {
+		printf("\n");
+	}
 }
 
 void processFile(int inputFD, int outputFD, struct stat* const fileStat) {
@@ -55,7 +62,11 @@ void processFile(int inputFD, int outputFD, struct stat* const fileStat) {
 	} else {
 		char* buffer = new char[4096];
 		int offset = 0;
+		readToken(fullData, offset, buffer, 4096);
+		lowercaseToken(buffer);
+		writeToken(buffer, outputFD);
 		while(readToken(fullData, offset, buffer, 4096)) {
+			writeToken(" ", outputFD);
 			lowercaseToken(buffer);
 			writeToken(buffer, outputFD);
 		}

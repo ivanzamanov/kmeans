@@ -15,7 +15,6 @@ void writeToken(const char* buffer, int fd) {
 	if(len != bytesWritten) {
 		printf("Error writing token\n");
 	}
-	write(fd, " ", 1);
 }
 
 const int DIFF = 'a' - 'A';
@@ -45,7 +44,7 @@ bool readToken(const char* data, int& offset, char* buffer, int buffLength) {
 	if(*str == '\0')
 		return false;
 	int leading = 0;
-	while(!isAlphanumeric(*str)) {
+	while(!isAlphanumeric(*str) && *str != '\0') {
 		str++;
 		leading++;
 	}
