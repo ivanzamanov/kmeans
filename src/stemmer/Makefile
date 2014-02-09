@@ -3,4 +3,4 @@
 all: build
 
 build:
-	$(CMD) stemmer.cpp -o ../../bin/stemmer
+	$(CMD) stemmer.cpp -o ../../bin/stemmer $(LIBS)

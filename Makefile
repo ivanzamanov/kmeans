@@ -1,7 +1,9 @@
 
 FLAGS=-Wall -std=c++11 -g
+LIB_DIRS=-I../common -L../../bin
+LIBS=-lkm_common
 CC=g++
-CMD=$(CC) $(FLAGS)
+CMD=$(CC) $(FLAGS) $(LIB_DIRS)
 
 export
 
@@ -11,8 +13,15 @@ clean:
 	rm -rf bin
 	mkdir bin
 
-extractor:
-	$(MAKE) -C src/extractor all
+common:
+	$(MAKE) -C src/common
 
-tokenizer:
-	$(MAKE) -C src/tokenizer all
+extractor: common
+	$(MAKE) -C src/extractor
+
+tokenizer: common
+	$(MAKE) -C src/tokenizer
+
+stemmer: common
+	$(MAKE) -C src/stemmer
+
