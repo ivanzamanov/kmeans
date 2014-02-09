@@ -61,3 +61,14 @@ bool readToken(const char* data, int& offset, char* buffer, int buffLength) {
 	return i > 0;
 }
 
+int readFullData(int fd, char** data) {
+	const int BUFF_SIZE = 4096 * 1024;
+	char* buffer = new char[BUFF_SIZE];
+	int bytes = 1;
+	bytes = read(fd, buffer, BUFF_SIZE);
+	if(bytes >= 0)
+		buffer[bytes] = 0;
+	*data = buffer;
+	return bytes;
+}
+

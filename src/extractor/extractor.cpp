@@ -1,5 +1,3 @@
-#include"matcher.h"
-
 #include<stdio.h>
 #include<cstdio>
 #include<cstring>
@@ -10,6 +8,9 @@
 #include<unistd.h>
 #include<fcntl.h>
 #include<dirent.h>
+
+#include"matcher.h"
+#include"utils.h"
 
 struct article_match {
 	int start;
@@ -59,36 +60,31 @@ int main(int argc, char** argv) {
 }
 
 void processFile(int inputFD, struct stat* const fileStat) {
-	// Read the whole file in memory
-	char* fullData = new char[fileStat->st_size];
-	int bytes = read(inputFD, fullData, fileStat->st_size);
-	fullData[fileStat->st_size] = 0;
+	char* fullData = 0;
+	readFullData(inputFD, &fullData);
 
-	if (bytes != fileStat->st_size) {
-		printf("Could not read entire file\n");
-	} else {
-		matcher* startMarker;
-		matcher* endMarker;
-		build_matcher("<BODY>", startMarker);
-		build_matcher("</BODY>", endMarker);
-		article_match* lastArticleMatch = 0;
-		int lastArticleEndPos = 0;
+	matcher* startMarker;
+	matcher* endMarker;
+	build_matcher("<BODY>", startMarker);
+	build_matcher("</BODY>", endMarker);
+	article_match* lastArticleMatch = 0;
+	int lastArticleEndPos = 0;
 
-		// Read articles while found
-		do {
-			char* offsetData = fullData + lastArticleEndPos;
-			// Try to find an article
-			lastArticleMatch = get_match(offsetData, *startMarker, *endMarker);
-			if(lastArticleMatch != 0) {
-				// Found an article, save it
-				save_article(lastArticleMatch, offsetData, articleCount + articleIndexOffset);
-				articleCount++;
-				// Move offset after the article's end.
-				lastArticleEndPos = lastArticleEndPos + lastArticleMatch->end;
-				delete lastArticleMatch;
-			}
-		} while(lastArticleMatch != 0);
-	}
+	// Read articles while found
+	do {
+		char* offsetData = fullData + lastArticleEndPos;
+		// Try to find an article
+		lastArticleMatch = get_match(offsetData, *startMarker, *endMarker);
+		if(lastArticleMatch != 0) {
+			// Found an article, save it
+			save_article(lastArticleMatch, offsetData, articleCount + articleIndexOffset);
+			articleCount++;
+			// Move offset after the article's end.
+			lastArticleEndPos = lastArticleEndPos + lastArticleMatch->end;
+			delete lastArticleMatch;
+		}
+	} while(lastArticleMatch != 0);
+
 	delete fullData;
 }
 

@@ -9,6 +9,7 @@
 #include<fcntl.h>
 
 #include"utils.h"
+#include"stem.h"
 
 void processFile(int inputFD, int outputFD, struct stat* fileStat);
 
@@ -53,23 +54,18 @@ int main(int argc, char** argv) {
 }
 
 void processFile(int inputFD, int outputFD, struct stat* const fileStat) {
-	char* fullData = new char[fileStat->st_size];
-	int bytes = read(inputFD, fullData, fileStat->st_size);
-	fullData[fileStat->st_size] = 0;
+	char* fullData = 0;
+	readFullData(inputFD, &fullData);
 
-	if (bytes != fileStat->st_size) {
-		printf("Could not read entire file\n");
-	} else {
-		char* buffer = new char[4096];
-		int offset = 0;
-		readToken(fullData, offset, buffer, 4096);
-		lowercaseToken(buffer);
+	char* buffer = new char[4096];
+	int offset = 0;
+	readToken(fullData, offset, buffer, 4096);
+	stemToken(buffer);
+	writeToken(buffer, outputFD);
+	while(readToken(fullData, offset, buffer, 4096)) {
+		writeToken(" ", outputFD);
+		stemToken(buffer);
 		writeToken(buffer, outputFD);
-		while(readToken(fullData, offset, buffer, 4096)) {
-			writeToken(" ", outputFD);
-			lowercaseToken(buffer);
-			writeToken(buffer, outputFD);
-		}
 	}
 	delete fullData;
 }

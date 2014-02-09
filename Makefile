@@ -7,7 +7,7 @@ CMD=$(CC) $(FLAGS) $(LIB_DIRS)
 
 export
 
-all: clean extractor tokenizer
+all: clean extractor tokenizer stemmer
 
 clean:
 	rm -rf bin

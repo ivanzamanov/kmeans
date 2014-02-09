@@ -4,5 +4,6 @@
 bool readToken(const char* data, int& offset, char* buffer, int buffLength);
 void lowercaseToken(char* token);
 void writeToken(const char* buffer, int outputFD);
+int readFullData(int fd, char** data);
 
 #endif
