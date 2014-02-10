@@ -1,6 +1,12 @@
 #include"ptree.h"
 
-int SIZE = 'z' - 'a';
+int SIZE = 'z' - '0' + 1;
+
+int ptree::getIndex(char c) {
+	int result = c - '0';
+	return result;
+}
+
 ptree::ptree() {
 	cap = 1;
 	size = 1;
@@ -13,7 +19,7 @@ ptree::ptree() {
 }
 
 ptree::~ptree() {
-	for(int i=0; i<cap; i++)
+	for(int i=0; i<size; i++)
 		delete table[i];
 	delete table;
 	delete values;
@@ -31,7 +37,10 @@ void ptree::expand() {
 		new_table[i] = 0;
 		new_values[i] = -1;
 	}
+
 	delete table;
+	delete values;
+
 	table = new_table;
 	values = new_values;
 	cap = new_cap;
@@ -41,7 +50,7 @@ int ptree::get(const char* str) {
 	const char* s = str;
 	int state = 0;
 	while(*s != '\0' && state >= 0) {
-		int c = *s - 'a';
+		int c = getIndex(*s);
 		state = table[state][c];
 		s++;
 	}
@@ -56,7 +65,7 @@ void ptree::add(const char* str, int i) {
 	const char* s = str;
 	int state = 0;
 	while(*s != '\0') {
-		int c = *s - 'a';
+		int c = getIndex(*s);
 		int n_state = table[state][c];
 		if(n_state == -1) {
 			break;
@@ -66,10 +75,10 @@ void ptree::add(const char* str, int i) {
 	}
 
 	while(*s != '\0') {
-		int c = *s - 'a';
-		int new_state = buildState();
-		table[state][c] = new_state;
-		state = new_state;
+		int c = getIndex(*s);
+		int n_state = buildState();
+		table[state][c] = n_state;
+		state = n_state;
 		s++;
 	}
 	values[state] = i;
@@ -78,6 +87,8 @@ void ptree::add(const char* str, int i) {
 int ptree::buildState() {
 	if(size == cap)
 		expand();
+	if(size == 1423)
+		size = size;
 
 	int result = size;
 	size++;
@@ -86,4 +97,3 @@ int ptree::buildState() {
 		table[result][i] = -1;
 	return result;
 }
-

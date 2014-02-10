@@ -25,11 +25,14 @@ echo "Tokenizing and stemming"
 COUNT=0
 for file in `ls $EXTRACT_DIR`
 do
-	./bin/tokenizer < $EXTRACT_DIR/$file | ./bin/stemmer > $STEM_DIR/$file
-#	./bin/tokenizer < $EXTRACT_DIR/$file > $STEM_DIR/$file
-	COUNT=$(($COUNT + 1))
-	if [ $(($COUNT % 100)) == 0 ]; then
-		echo "$COUNT"
+	if [ ! -f $STEM_DIR/$file ]; then
+		./bin/tokenizer < $EXTRACT_DIR/$file | ./bin/stemmer > $STEM_DIR/$file
+		COUNT=$(($COUNT + 1))
+		if [ $(($COUNT % 100)) == 0 ]; then
+			echo "$COUNT"
+		fi
 	fi
 done
 
+echo "Indexing"
+./bin/indexer $STEM_DIR /tmp/index

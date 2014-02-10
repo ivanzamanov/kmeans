@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 		outputFD = 1;
 	} else {
 		char* outputPath = argv[2];
-		outputFD = open(outputPath, O_WRONLY);
+		outputFD = open(outputPath, O_WRONLY | O_CREAT, 0664);
 		if(outputFD < 0) {
 			printf("Cannot open file %s\n", outputPath);
 			return 1;

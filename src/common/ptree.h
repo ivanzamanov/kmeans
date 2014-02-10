@@ -9,6 +9,7 @@ public:
 	int get(const char* str);
 
 private:
+	int getIndex(char c);
 	void expand();
 	int buildState();
 	int** table;
