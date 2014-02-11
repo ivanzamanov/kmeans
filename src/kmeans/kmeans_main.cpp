@@ -56,6 +56,8 @@ void processFile(const char* path, const char* name, ptree<int>& p, list<article
 	int* index_ptr = 0;
 	int index = 0;
 	while(readToken(fullData, offset, buffer, 4096)) {
+		if(strlen(buffer) <= 3)
+			continue;
 		index_ptr = p.get(buffer);
 		if(index_ptr == 0) {
 			p.add(buffer, tokenCount);
@@ -89,7 +91,7 @@ void processDirectory(const char* inputDirPath) {
 		entry = readdir(dirHandle);
 		docCount++;
 	}
-	printf("Unique tokens: %d\n", tokenCount);
+	printf("Unique tokens: %d in %d documents\n", tokenCount, (int)docCount);
 	// Document frequencies
 	double* dfs = new double[tokenCount];
 	for (int i=0; i<tokenCount; i++)

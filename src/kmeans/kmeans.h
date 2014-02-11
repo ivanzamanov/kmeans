@@ -15,6 +15,11 @@ struct article_entry {
 	vector v;
 };
 
+struct iter {
+	int size;
+	int index = 0;
+};
+
 typedef list<article_entry*> entryList;
 
 struct cluster {

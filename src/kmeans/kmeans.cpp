@@ -77,40 +77,48 @@ void clone(vector& dest, vector& src) {
 void computeCentroid(vector& centroid, const list<vector*> &vectors) {
 	if(vectors.size() == 0)
 		return;
-	vector& first = *vectors.get(0);
-	clone(centroid, first);
+	list<iter*> iters;
+	for(int i=0; i<vectors.size(); i++) {
+		iter *it = new iter;
+		it->size = vectors.get(i)->size;
+		iters.add(it);
+	}
 
-	for(int i=1; i<vectors.size(); i++) {
-		vector& member = *(vectors.get(i));
-		for(int j=0; j<member.size; j++) {
-			int key = member.keys[j];
-			double value = member.values[j];
-	
-			if(centroid.size ==0) {
-				expandVector(centroid);
-				centroid.keys[0] = key;
-				centroid.values[0] = value;
-				continue;
+	int stop = 0;
+	while(!stop) {
+		int min_key = 1 << 30;
+		stop = 1;
+		for(int i=0; i<iters.size(); i++) {
+			iter& it = *(iters.get(i));
+			int key = vectors.get(i)->keys[it.index];
+			if(key < min_key && it.index < it.size) {
+				stop = 0;
+				min_key = key;
 			}
-	
-		  int index = bin_search(centroid.keys, centroid.size, key);
-		  if(index >= 0) {
-		    centroid.values[index] += value;
-		  } else {
-		    expandVector(centroid);
-		    index = -index - 1;
-		    for (int k = centroid.size-1; k > index; k--) {
-		      centroid.keys[k] = centroid.keys[k-1];
-		      centroid.values[k] = centroid.values[k-1];
-		    }
-		    centroid.keys[index] = key;
-		    centroid.values[index] = value;
-		  }
 		}
+		if(stop)
+			continue;
+
+		expandVector(centroid);
+		centroid.keys[centroid.size-1] = min_key;
+
+		double value = 0;
+		for(int i=0; i<iters.size(); i++) {
+			iter& it = *(iters.get(i));
+			int key = vectors.get(i)->keys[it.index];
+			double val = vectors.get(i)->values[it.index];
+			if(key == min_key && it.index < it.size) {
+				value += val;
+				it.index++;
+			}
+		}
+		centroid.values[centroid.size-1] = value;
 	}
 
 	for(int i=0; i<centroid.size; i++)
 		centroid.values[i] /= vectors.size();
+	for(int i=0; i<iters.size(); i++)
+		delete iters.get(i);
 }
 
 void recomputeCentroid(cluster& cl) {
@@ -163,20 +171,21 @@ double printRSS(cluster* clusters, int n) {
 		printf("Cluster %d: RSS = %f Members = %d\n", i, rss, clusters[i].members.size());
 		result += rss;
 	}
+	printf("Total RSS = %f\n", result);
 	return result;
 }
 
 const int MAX_ITERATIONS = 10;
 const double THRESHOLD = 1e-20;
 void clusterize(int k, entryList &l) {
+	printf("Clusterizing in %d clusters\n", k);
 	cluster *clusters = new cluster[k];
 	selectSeeds(clusters, l, k);
 	double RSS = printRSS(clusters, k);
-	double prevRSS = 0;
-	printf("Total RSS = %f\n", RSS);
+	double prevRSS = 1e+20;
 
 	int iterations = 0;
-	while(iterations < MAX_ITERATIONS && (RSS - prevRSS) < THRESHOLD) {
+	while(iterations < MAX_ITERATIONS && (prevRSS - RSS) > THRESHOLD) {
 		iterations++;
 		printf("Iteration %d\n", iterations);
 		// Clear cluster members.
@@ -197,7 +206,6 @@ void clusterize(int k, entryList &l) {
 
 		prevRSS = RSS;
 		RSS = printRSS(clusters, k);
-		printf("Total RSS = %f\n", RSS);
 	}
 
 	delete[] clusters;
@@ -217,6 +225,7 @@ void normalize(article_entry* entry) {
 
 void kmeans(list<article_entry*> &l) {
 	// Normalize vectors
+	printf("Normalizing vectors\n");
 	for(int i=0; i<l.size(); i++)
 		normalize(l.get(i));
 	int k = 10;
