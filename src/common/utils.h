@@ -45,6 +45,8 @@ inline void copy_array(T* from, T* to, const int length) {
 
 template<class T>
 inline int bin_search(T* array, int n, const T& x) {
+	if(n < 1)
+		return -1;
   int left = 0;
   int right = n;
   int current;

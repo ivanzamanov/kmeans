@@ -12,22 +12,21 @@ public:
   int cap;
   int size;
 
-  void insert(const char& key, const T& data);
-  const T& get(const char& key, const T& def);
+  void insert(const int& key, const T& data);
+  const T& get(const int& key, const T& def);
 
-private:
   void expand();
 
   T* data;
-  char* keys;
+  int* keys;
 };
 
 template<class T>
 hash<T>::hash() {
   hash<T>& h = *this;
-  h.cap = 1;
+  h.cap = 2;
   h.size = 0;
-  h.keys = new char[cap];
+  h.keys = new int[cap];
   for (int i=0; i<cap; i++) {
     h.keys[i] = -1;
   }
@@ -39,7 +38,7 @@ hash<T>::hash(const hash<T>& other) {
   hash<T>& h = *this;
   h.cap = other.cap;
   h.size = other.size;
-  h.keys = new char[cap];
+  h.keys = new int[cap];
   h.data = new T[cap];
   for (int i=0; i<size; i++) {
     h.keys[i] = other.keys[i];
@@ -48,7 +47,7 @@ hash<T>::hash(const hash<T>& other) {
 }
 
 template<class T>
-void hash<T>::insert(const char& key, const T& el) {
+void hash<T>::insert(const int& key, const T& el) {
   int index = bin_search(keys, size, key);
   if(index >= 0) {
     this->data[index] = el;
@@ -67,7 +66,7 @@ void hash<T>::insert(const char& key, const T& el) {
 }
 
 template<class T>
-const T& hash<T>::get(const char& key, const T& def) {
+const T& hash<T>::get(const int& key, const T& def) {
   int index = bin_search(keys, size, key);
   if(index >= 0)
     return data[index];

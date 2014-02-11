@@ -61,10 +61,12 @@ void processFile(int inputFD, int outputFD, struct stat* const fileStat) {
 	int offset = 0;
 	readToken(fullData, offset, buffer, 4096);
 	lowercaseToken(buffer);
+	stemToken(buffer);
 	writeToken(buffer, outputFD);
 	while(readToken(fullData, offset, buffer, 4096)) {
 		writeToken(" ", outputFD);
 		lowercaseToken(buffer);
+		stemToken(buffer);
 		writeToken(buffer, outputFD);
 	}
 	delete fullData;

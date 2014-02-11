@@ -26,7 +26,9 @@ COUNT=0
 for file in `ls $EXTRACT_DIR`
 do
 	if [ ! -f $STEM_DIR/$file ]; then
-		./bin/tokenizer < $EXTRACT_DIR/$file | ./bin/stemmer > $STEM_DIR/$file
+#		TOKENIZED="`./bin/tokenizer < $EXTRACT_DIR/$file`"
+#		./bin/stemmer > $STEM_DIR/$file <<< "$TOKENIZED"
+		./bin/tokenizer < $EXTRACT_DIR/$file > $STEM_DIR/$file
 		COUNT=$(($COUNT + 1))
 		if [ $(($COUNT % 100)) == 0 ]; then
 			echo "$COUNT"
@@ -34,5 +36,5 @@ do
 	fi
 done
 
-echo "Indexing"
-./bin/indexer $STEM_DIR /tmp/index
+echo "Clustering"
+./bin/kmeans $STEM_DIR

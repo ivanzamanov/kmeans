@@ -7,7 +7,7 @@ CMD=$(CC) $(FLAGS) $(LIB_DIRS)
 
 export
 
-all: clean extractor tokenizer stemmer indexer
+all: clean extractor tokenizer stemmer kmeans
 
 clean:
 	rm -rf bin
@@ -25,5 +25,5 @@ tokenizer: common
 stemmer: common
 	$(MAKE) -C src/stemmer
 
-indexer: common
-	$(MAKE) -C src/indexer
+kmeans: common
+	$(MAKE) -C src/kmeans
