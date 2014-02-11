@@ -36,7 +36,7 @@ void save(list<article_entry*> &entries, hash<int> &h, const char* name) {
 }
 
 int tokenCount = 0;
-void processFile(const char* path, const char* name, ptree& p, list<article_entry*> &entries) {
+void processFile(const char* path, const char* name, ptree<int>& p, list<article_entry*> &entries) {
 	int fd = open(path, O_RDONLY);
 	if(fd < 0) {
 		printf("Cannot open file %s\nCode = %d\n", path, fd);
@@ -52,23 +52,27 @@ void processFile(const char* path, const char* name, ptree& p, list<article_entr
 	hash<int> h;
 	bool hasToken = readToken(fullData, offset, buffer, 4096);
 	if(hasToken) {
-		int index = p.get(buffer);
-		if(index < 0) {
+		int *index_ptr = p.get(buffer);
+		int index;
+		if(index_ptr == 0) {
 			p.add(buffer, tokenCount);
 			index = tokenCount;
 			tokenCount++;
-		}
+		} else
+			index = *index_ptr;
 		int tf = h.get(index, 0);
 		tf++;
 		h.insert(index, tf);
 		
 		while(readToken(fullData, offset, buffer, 4096)) {
-			index = p.get(buffer);
-			if(index < 0) {
+			index_ptr = p.get(buffer);
+			if(index_ptr == 0) {
 				p.add(buffer, tokenCount);
 				index = tokenCount;
 				tokenCount++;
-			}
+		} else
+			index = *index_ptr;
+
 			tf = h.get(index, 0);
 			tf++;
 			h.insert(index, tf);
@@ -85,7 +89,7 @@ void processDirectory(const char* inputDirPath) {
 
 	list<article_entry*> entries;
 	char path[4096];
-	ptree p;
+	ptree<int> p;
 	int i = 0;
 	while(entry != NULL) {
 		sprintf(path, "%s/%s", inputDirPath, entry->d_name);

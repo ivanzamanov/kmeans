@@ -1,6 +1,6 @@
 REUTERS_DIR=data/reuters21578/
-EXTRACT_DIR=/tmp/extracted
-STEM_DIR=/tmp/stemmed
+EXTRACT_DIR=data/extracted
+STEM_DIR=data/stemmed
 
 set -e
 

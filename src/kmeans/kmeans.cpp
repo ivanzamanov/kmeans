@@ -49,6 +49,10 @@ double distanceSQ(const vector& v1, const vector& v2) {
 	return result;
 }
 
+void recomputeCentroid(cluster& cl) {
+	
+}
+
 void selectSeeds(cluster* clusters, entryList &l, int k) {
 	int index = 0;
 	for(int i=0; i<l.size(); i++) {
@@ -57,6 +61,8 @@ void selectSeeds(cluster* clusters, entryList &l, int k) {
 		article_entry* e = l.get(i);
 		cl.members.add(e);
 	}
+	for(int i=0; i<l.size(); i++)
+		recomputeCentroid(clusters[i]);
 }
 
 cluster& findBestCluster(cluster* clusters, int k, vector& v) {
@@ -70,10 +76,6 @@ cluster& findBestCluster(cluster* clusters, int k, vector& v) {
 		}
 	}
 	return clusters[best_cl];
-}
-
-void recomputeCentroid(cluster& cl) {
-	
 }
 
 const int MAX_ITERATIONS = 10;
