@@ -60,6 +60,8 @@ inline int bin_search(T* array, int n, const T& x) {
       left = current + 1;
 		}
 	}
+	if(right == 0)
+		return -1;
 	return -right;
 }
 

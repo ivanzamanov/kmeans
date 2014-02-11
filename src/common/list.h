@@ -36,7 +36,7 @@ public:
 		s++;
 	};
 
-	T get(int i) {
+	T get(int i) const {
 		return arr[i];
 	};
 

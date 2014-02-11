@@ -17,6 +17,7 @@ private:
 	int buildState();
 	int** table;
 	T* values;
+	bool* flags;
 	int cap;
 	int size;
 };
@@ -37,6 +38,8 @@ ptree<T>::ptree() {
 		table[0][i] = -1;
 	values = new T[cap];
 	values[0] = -1;
+	flags = new bool[cap];
+	flags[0] = 0;
 }
 
 template<class T>
@@ -45,6 +48,7 @@ ptree<T>::~ptree() {
 		delete table[i];
 	delete table;
 	delete values;
+	delete flags;
 }
 
 template<class T>
@@ -52,20 +56,24 @@ void ptree<T>::expand() {
 	int new_cap = cap << 1;
 	int** new_table = new int*[new_cap];
 	T* new_values = new T[new_cap];
+	bool* new_flags = new bool[new_cap];
 	for(int i=0; i<cap; i++) {
 		new_table[i] = table[i];
 		new_values[i] = values[i];
+		new_flags[i] = flags[i];
 	}
 	for(int i=cap; i<new_cap; i++) {
 		new_table[i] = 0;
-		new_values[i] = -1;
+		new_flags[i] = 0;
 	}
 
 	delete table;
 	delete values;
+	delete flags;
 
 	table = new_table;
 	values = new_values;
+	flags = new_flags;
 	cap = new_cap;
 }
 
@@ -79,10 +87,10 @@ T* ptree<T>::get(const char* str) {
 		s++;
 	}
 
-	if(state == -1)
+	if(state == -1 || !flags[state])
 		return 0;
 
-	return &(values[state]);
+	return values + state;
 }
 
 template<class T>
@@ -107,6 +115,7 @@ void ptree<T>::add(const char* str, T i) {
 		s++;
 	}
 	values[state] = i;
+	flags[state] = 1;
 }
 
 template<class T>
