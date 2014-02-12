@@ -97,10 +97,10 @@ void computeCentroid(vector& centroid, const list<vector*> &vectors) {
 			}
 		}
 		if(stop)
-			continue;
+			break;
 
 		expandVector(centroid);
-		centroid.keys[centroid.size-1] = min_key;
+		centroid.keys[centroid.size - 1] = min_key;
 
 		double value = 0;
 		for(int i=0; i<iters.size(); i++) {
@@ -112,7 +112,8 @@ void computeCentroid(vector& centroid, const list<vector*> &vectors) {
 				it.index++;
 			}
 		}
-		centroid.values[centroid.size-1] = value;
+
+		centroid.values[centroid.size - 1] = value;
 	}
 
 	for(int i=0; i<centroid.size; i++)
@@ -139,8 +140,12 @@ void selectSeeds(cluster* clusters, entryList &l, int k) {
 		article_entry* e = l.get(i);
 		cl.members.add(e);
 	}
-	for(int i=0; i<k; i++)
+	printf("Computing centroids ");
+	for(int i=0; i<k; i++) {
+		printf("%d ", i);
 		recomputeCentroid(clusters[i]);
+	}
+	printf("\n");
 }
 
 cluster& findBestCluster(cluster* clusters, int k, vector& v) {
@@ -177,6 +182,7 @@ double printRSS(cluster* clusters, int n) {
 
 const int MAX_ITERATIONS = 10;
 const double THRESHOLD = 1e-20;
+const int CLUSTERS = 10;
 void clusterize(int k, entryList &l) {
 	printf("Clusterizing in %d clusters\n", k);
 	cluster *clusters = new cluster[k];
@@ -201,8 +207,12 @@ void clusterize(int k, entryList &l) {
 		}
 
 		// Recompute centroids
-		for(int i=0; i<k; i++)
+		printf("Computing centroids ");
+		for(int i=0; i<k; i++) {
+			printf("%d ", i);
 			recomputeCentroid(clusters[i]);
+		}
+		printf("\n");
 
 		prevRSS = RSS;
 		RSS = printRSS(clusters, k);
@@ -228,7 +238,5 @@ void kmeans(list<article_entry*> &l) {
 	printf("Normalizing vectors\n");
 	for(int i=0; i<l.size(); i++)
 		normalize(l.get(i));
-	int k = 10;
-
-	clusterize(k, l);
+	clusterize(CLUSTERS, l);
 }

@@ -117,6 +117,7 @@ void processDirectory(const char* inputDirPath) {
 }
 
 int main(int argc, char** argv) {
+	setbuf(stdout, NULL);
 	if(argc < 2) {
 		printf("Not enough arguments\n");
 		printf("Usage: %s <input_dir> <output_file>", argv[0]);

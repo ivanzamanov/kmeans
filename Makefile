@@ -1,5 +1,5 @@
 
-FLAGS=-Wall -std=c++11 -g
+FLAGS=-Wall -std=c++11 -O3
 LIB_DIRS=-I../common -L../../bin
 LIBS=-lkm_common
 CC=g++
